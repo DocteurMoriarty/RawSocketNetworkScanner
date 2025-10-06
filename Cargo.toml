@@ -1,0 +1,10 @@
+[package]
+name = "projet_rsns_morissetlarresacha"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+args = "2.2.0"
+clap = { version = "4.5.48", features = ["derive"] }
+displaydoc = "0.2.5"
+thiserror = "2.0.17"
