@@ -28,4 +28,6 @@ pub enum ParseError {
     NotEnoughOctets,
     /// Invalid hex value
     InvalidHex,
+    /// Invalid length
+    InvalidLength,
 }
