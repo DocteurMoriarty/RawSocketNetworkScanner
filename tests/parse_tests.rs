@@ -3,13 +3,17 @@ mod tests {
     use projet_rsns_morissetlarresacha::{
         parsing::my_parser::{
             parse_mac, 
-            parse_ipv4
+            parse_ipv4,
+            parse_hex
         },
         structs::ipv4::Ipv4Addr,
         errors::err::ParseError
     };
 
-    // --------- MAC Address Tests ---------
+    ///////////////////////////////////////////
+    ///          MAC Parsing Tests          ///
+    ///////////////////////////////////////////
+    
     #[test]
     fn test_parse_mac_valid() {
         let mac_str = "01:23:45:67:89:ab";
@@ -78,7 +82,10 @@ mod tests {
         );
     }
 
-    // --------- IPv4 Tests ---------
+    ///////////////////////////////////////////
+    ///         IPv4 Parsing Tests          ///
+    ///////////////////////////////////////////
+    
     #[test]
     fn test_parse_ipv4_valid() {
         let ip_str = "192.168.1.1";
@@ -146,4 +153,73 @@ mod tests {
             )
         );
     }
+
+    #[test]
+    fn test_parse_hex_valid() {
+        let hex_str = "0x1A";
+        let result = parse_hex(
+            hex_str
+        )
+        .unwrap();
+        assert_eq!(
+            result, 
+            0x1A
+        );
+        let hex_str2 = "ff";
+        let result2 = parse_hex(
+            hex_str2
+        )
+        .unwrap();
+        assert_eq!(
+            result2, 
+            0xFF
+        );
+    }
+
+    #[test]
+    fn test_parse_hex_invalid() {
+        let hex_str = "0xZZ";
+        let result = parse_hex(
+            hex_str
+        );
+        assert!(
+            matches!(
+                result, 
+                Err(
+                    ParseError::InvalidHex
+                )
+            )
+        );
+    }
+
+    #[test]
+    fn test_parse_hex_empty() {
+        let hex_str = "";
+        let result = parse_hex(
+            hex_str
+        );
+        assert!(
+            matches!(
+                result, 
+                Err(
+                    ParseError::InvalidHex
+                )
+            )
+        );
+    }
+
+    #[test]
+    fn test_parse_hex_no_prefix() {
+        let hex_str = "1f";
+        let result = parse_hex(
+            hex_str
+        )
+        .unwrap();
+        assert_eq!(
+            result, 
+            0x1F
+        );
+    }
+
+
 }
