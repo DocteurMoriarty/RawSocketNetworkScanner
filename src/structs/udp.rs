@@ -7,9 +7,10 @@
 
 
 #[derive(Debug, Clone, Copy)]
-pub struct UdpHeader {
+pub struct UdpHeader <'a>{
     pub src_port: u16,
     pub dst_port: u16,
     pub length: u16,
     pub checksum: u16,
+    payload: &'a[u8]
 }
