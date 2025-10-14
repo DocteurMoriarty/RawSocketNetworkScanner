@@ -1,12 +1,15 @@
 use crate::errors::err::{
     Result,
-    ParseError::InvalidLengthBytes
+    ParseError::{
+        InvalidLengthBytes,
+        ValueTooLarge
+    }
 };
 
 pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<Vec<u8>> {
     if size != 2 
-        && size != 4 
-        && size != 8 
+    && size != 4 
+    && size != 8 
     {
         return Err(
             InvalidLengthBytes { 
@@ -20,7 +23,25 @@ pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<Vec<u8
         0u8; 
         size
     ];
+    
     let value = value.into();
+
+    if size < 8 
+    && value >= (
+        1u64 << (
+            size * 8
+        )
+    ) 
+    {
+        return Err(
+            ValueTooLarge { 
+                value, 
+                size 
+            }
+        );
+    }
+
+
     for i in 0..size {
         bytes[
             size - 1 - i

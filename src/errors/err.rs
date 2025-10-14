@@ -33,5 +33,10 @@ pub enum ParseError {
     /// Invalid length bytes
     InvalidLengthBytes {
         size : usize
-    }
+    },
+    /// Value too large to fit in requested size
+    ValueTooLarge { 
+        value: u64, 
+        size: usize 
+    },
 }

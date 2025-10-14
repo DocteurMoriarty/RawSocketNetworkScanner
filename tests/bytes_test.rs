@@ -48,8 +48,8 @@ mod tests {
 
     #[test]
     fn test_value_too_large() {
-        // Si tu implémentes ValueTooLarge, tu peux tester :
-        // let err = convert_n_to_bytes(0x1234u16, 1).unwrap_err();
-        // assert_eq!(err, ParseError::ValueTooLarge { value: 0x1234, size: 1 });
+        let err = convert_n_to_bytes(0x12345678u32, 2).unwrap_err();
+        assert_eq!(err, ParseError::ValueTooLarge { value: 0x12345678, size: 2 });
     }
+
 }
