@@ -30,4 +30,8 @@ pub enum ParseError {
     InvalidHex,
     /// Invalid length
     InvalidLength,
+    /// Invalid length bytes
+    InvalidLengthBytes {
+        size : usize
+    }
 }

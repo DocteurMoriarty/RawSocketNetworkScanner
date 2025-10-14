@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TCP <'a>{
+pub struct TcpHeader <'a>{
     pub src_port: u16,
     pub dst_port: u16,
     pub sequence_number: u32,
@@ -11,6 +11,6 @@ pub struct TCP <'a>{
     pub checksum: u16,
     pub urgent_pointer: u16,
     pub options: Option<Vec<u8>>,
-    pub payload: &'a [u8],
+    pub payload: Option<&'a [u8]>
 }
 
