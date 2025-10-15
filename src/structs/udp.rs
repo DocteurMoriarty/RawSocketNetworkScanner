@@ -12,5 +12,5 @@ pub struct UdpHeader <'a>{
     pub dst_port: u16,
     pub length: u16,
     pub checksum: u16,
-    payload: Option<&'a[u8]>
+    pub payload: Option<&'a[u8]>
 }

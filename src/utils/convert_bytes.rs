@@ -1,3 +1,9 @@
+/// Fonction utilitaire pour convertir un nombre en un vecteur d’octets de taille spécifiée (2, 4 ou 8 octets)
+/// en format Big Endian.
+/// Cette fonction renvoie une erreur personnaliser
+/// Cette fonction a est develloper pour eviter l’utilisation de fonctions haut niveau
+/// et de la librairie standard std, comme to_be_bytes ou copy_from_slice
+
 use crate::errors::err::{
     Result,
     ParseError::{
