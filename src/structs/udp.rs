@@ -6,11 +6,11 @@
 /// ///////////////////////////////////////////
 
 
-#[derive(Debug, Clone, Copy)]
-pub struct UdpHeader <'a>{
+#[derive(Debug, Clone)]
+pub struct UdpHeader {
     pub src_port: u16,
     pub dst_port: u16,
     pub length: u16,
     pub checksum: u16,
-    pub payload: Option<&'a[u8]>
+    pub payload: Option<Vec<u8>>
 }

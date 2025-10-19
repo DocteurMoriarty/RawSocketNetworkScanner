@@ -18,16 +18,12 @@ mod tests {
     fn test_parse_mac_valid() {
         let mac_str = "01:23:45:67:89:ab";
         let expected = [
-            0x01, 
-            0x23, 
-            0x45, 
-            0x67, 
-            0x89, 
-            0xab
+            0x01,0x23,0x45,0x67,0x89,0xab
         ];
         let result = parse_mac(
             mac_str
         ).unwrap();
+
         assert_eq!(
             result, 
             expected

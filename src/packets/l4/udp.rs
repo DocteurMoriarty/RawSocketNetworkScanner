@@ -10,16 +10,10 @@ use crate::{
 };
 
 pub fn pack_udp(header: &UdpHeader) -> Result<Vec<u8>> {
-    let payload: &[
-        u8
-    ];
-    if let Some(
-        p
-    ) = header.payload {
+    let payload: &[u8];
+    if let Some(p) = &header.payload {
         payload = p;
-    } 
-    else 
-    {
+    } else {
         payload = &[];
     }
 

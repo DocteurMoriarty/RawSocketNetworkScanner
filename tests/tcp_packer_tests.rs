@@ -74,45 +74,16 @@
         assert_eq!(&packet[20..24], &options[..]);
     }
 
-    /*
     #[test]
-    fn test_tcp_pack_error_propagation() {
-        // Valeur trop grande pour u16 → doit produire ValueTooLarge
-        let header = TcpHeader {
-            src_port: 70000, // en test tu peux mettre un cast
-            dst_port: 80,
-            sequence_number: 0,
-            ack_nowledgment_number: 0,
-            data_offset: 0,
-            reserved: 0,
-            flags: 0x18,
-            window: 1024,
-            checksum: 0,
-            urgent_pointer: 0,
-            options: None,
-            payload: None,
-        };
-
-        match pack_tcp(&header) {
-            Ok(_) => panic!("Expected ValueTooLarge error"),
+    fn test_convert_n_to_bytes_value_too_large() {
+        let result = convert_n_to_bytes(70000u64, 2);
+        match result {
             Err(ParseError::ValueTooLarge { value, size }) => {
                 assert_eq!(value, 70000);
                 assert_eq!(size, 2);
             }
-            Err(e) => panic!("Unexpected error: {:?}", e),
+            _ => panic!("Expected ValueTooLarge error"),
         }
-    */
-        #[test]
-        fn test_convert_n_to_bytes_value_too_large() {
-            let result = convert_n_to_bytes(70000u64, 2);
-            match result {
-                Err(ParseError::ValueTooLarge { value, size }) => {
-                    assert_eq!(value, 70000);
-                    assert_eq!(size, 2);
-                }
-                _ => panic!("Expected ValueTooLarge error"),
-            }
-        }
-
+    }
 
 }

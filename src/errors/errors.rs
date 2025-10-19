@@ -39,4 +39,8 @@ pub enum ParseError {
         value: u64, 
         size: usize 
     },
+    /// Missing required field
+    MissingRequiredField(
+        &'static str
+    ),
 }
