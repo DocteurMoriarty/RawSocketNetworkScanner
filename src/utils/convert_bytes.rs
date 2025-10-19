@@ -13,6 +13,12 @@ use crate::errors::errors::{
 };
 
 pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<Vec<u8>> {
+    
+    if size == 1 {
+        let byte = (value.into() & 0xFF) as u8;
+        return Ok(vec![byte]);
+    }
+    
     if size != 2 
     && size != 4 
     && size != 8 
