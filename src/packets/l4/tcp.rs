@@ -4,7 +4,7 @@ use crate::{
         push_bytes::push_bytes
     },
     structs::tcp::TcpHeader,
-    errors::err::Result,
+    errors::errors::Result,
 };
 
 

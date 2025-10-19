@@ -1,5 +1,5 @@
 use crate::structs::ipv4::Ipv4Addr;
-use crate::errors::err::ParseError;
+use crate::errors::errors::ParseError;
 
 // Functions of parsing
 

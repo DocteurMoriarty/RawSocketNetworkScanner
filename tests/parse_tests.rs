@@ -7,7 +7,7 @@ mod tests {
             parse_hex
         },
         structs::ipv4::Ipv4Addr,
-        errors::err::ParseError
+        errors::errors::ParseError
     };
 
     ///////////////////////////////////////////

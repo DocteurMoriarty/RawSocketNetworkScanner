@@ -4,7 +4,7 @@
 /// Cette fonction a est develloper pour eviter l’utilisation de fonctions haut niveau
 /// et de la librairie standard std, comme to_be_bytes ou copy_from_slice
 
-use crate::errors::err::{
+use crate::errors::errors::{
     Result,
     ParseError::{
         InvalidLengthBytes,
