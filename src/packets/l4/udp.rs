@@ -5,8 +5,7 @@ use crate::{
     },
     structs::udp::UdpHeader,
     errors::errors::{
-        Result,
-        ParseError
+        Result
     }
 };
 

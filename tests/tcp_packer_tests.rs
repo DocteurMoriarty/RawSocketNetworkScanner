@@ -4,7 +4,7 @@
         structs::tcp::TcpHeader,
         packets::l4::tcp::pack_tcp,
         utils::convert_bytes::convert_n_to_bytes,
-        errors::err::ParseError,
+        errors::errors::ParseError,
     };
 
     #[test]

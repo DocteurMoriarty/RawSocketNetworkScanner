@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use projet_rsns_morissetlarresacha::{
-        errors::err::ParseError,
+        errors::errors::ParseError,
         utils::convert_bytes::convert_n_to_bytes
     };
 
