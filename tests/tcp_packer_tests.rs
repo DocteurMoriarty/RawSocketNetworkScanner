@@ -43,7 +43,7 @@
             checksum: 0,
             urgent_pointer: 0,
             options: None,
-            payload: Some(payload),
+            payload: Some(payload.to_vec()),
         };
 
         let packet = pack_tcp(&header).unwrap();

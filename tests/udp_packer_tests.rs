@@ -29,7 +29,7 @@ fn test_udp_pack_with_payload() {
         dst_port: 5555,        // 0x15B3
         length: (8 + payload.len()) as u16,
         checksum: 0xBEEF,      // 0xBEEF → [0xBE, 0xEF]
-        payload: Some(payload),
+        payload: Some(payload.to_vec()),
     };
 
     let packet = pack_udp(&header).unwrap();
