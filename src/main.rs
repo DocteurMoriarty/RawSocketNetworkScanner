@@ -25,8 +25,8 @@ fn main() {
 
 fn build_and_display_packet(args: &Args) -> Result<Vec<u8>, Box<dyn Error>> {
     let packet_builder = PacketBuilder::from_cli_args(
-        args.src_ip().clone(),
-        args.dst_ip().clone(),
+        args.src_ip(),
+        args.dst_ip(),
         args.src_mac().clone(),
         args.dst_mac().clone(),
         Some(12345), // Port source par défaut

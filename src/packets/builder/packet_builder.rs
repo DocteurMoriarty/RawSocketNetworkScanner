@@ -18,6 +18,7 @@ use crate::{
         l4::{tcp::pack_tcp, udp::pack_udp},
     },
     utils::checksum::internet_checksum,
+    parsing::my_parser::parse_ipv4,
     errors::errors::{
         Result,
         ParseError
@@ -200,26 +201,25 @@ impl NetworkPacket {
 
 impl PacketBuilder {
     pub fn from_cli_args(
-        src_ip: Option<String>,
-        dst_ip: Option<String>,
+        src_ip: Option<&str>,
+        dst_ip: Option<&str>,
         src_mac: Option<[u8; 6]>,
         dst_mac: Option<[u8; 6]>,
         src_port: Option<u16>,
         dst_port: Option<u16>,
-        l4_protocol: Option<String>,
+        l4_protocol: Option<&str>,
         ip_bitfield: Option<u8>,
         payload: Option<Vec<u8>>,
     ) -> Result<Self> {
 
-        let src_ip = src_ip
-            .ok_or_else(|| ParseError::MissingRequiredField("src_ip"))?
-            .parse::<std::net::Ipv4Addr>()
-            .map_err(|_| ParseError::InvalidIpv4)?;
-        
-        let dst_ip = dst_ip
-            .ok_or_else(|| ParseError::MissingRequiredField("dst_ip"))?
-            .parse::<std::net::Ipv4Addr>()
-            .map_err(|_| ParseError::InvalidIpv4)?;
+        let src_ip = parse_ipv4(
+            src_ip.ok_or(ParseError::MissingRequiredField("src_ip"))?
+        )?;
+
+        let dst_ip = parse_ipv4(
+            dst_ip.ok_or(ParseError::MissingRequiredField("dst_ip"))?
+        )?;
+
 
         let src_mac = src_mac.unwrap_or([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
         let dst_mac = dst_mac.unwrap_or([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]); 
@@ -233,8 +233,8 @@ impl PacketBuilder {
         };
         let ip_bitfield = ip_bitfield.unwrap_or(0x00);
         Ok(PacketBuilder {
-            src_ip: Ipv4Addr { octets: src_ip.octets() },
-            dst_ip: Ipv4Addr { octets: dst_ip.octets() },
+            src_ip,
+            dst_ip,
             src_mac,
             dst_mac,
             src_port,
