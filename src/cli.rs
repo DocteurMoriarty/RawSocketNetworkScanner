@@ -1,3 +1,4 @@
+#![cfg(feature = "std")]
 //Command Line Interface
 
 
@@ -83,8 +84,8 @@ pub mod args {
         }
         pub fn dry_run(
             &self
-        ) -> &Option<bool> { 
-            &self.dry_run 
+        ) -> bool { 
+            self.dry_run 
         }
         pub fn count(
             &self
@@ -150,6 +151,7 @@ pub mod args {
         )]
         timeout_ms: Option<u64>,
 
+
         #[arg(
             short = 'f',
             long = "debug_file",
@@ -160,8 +162,7 @@ pub mod args {
         #[arg(
             short = 'g',
             long = "debug_format",
-            help = "format: --debug_format=json",
-            default_value = "json"
+            help = "format: --debug_format=json"
         )]
         debug_format: Option<String>,
 
@@ -180,7 +181,7 @@ pub mod args {
             help = "format: --dry_run",
             action = clap::ArgAction::SetTrue
         )]
-        dry_run: Option<bool>,
+        dry_run: bool,
 
         //count for iterations in structs
         #[arg(

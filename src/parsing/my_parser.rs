@@ -1,9 +1,9 @@
 use crate::structs::ipv4::Ipv4Addr;
 use crate::errors::errors::ParseError;
 
-// Functions of parsing
+/// Functions of parsing
 
-// Parse une MAC address string -> [u8; 6]
+/// Parse une MAC address string -> [u8; 6]
 pub fn parse_mac(
     mac: &str
 ) ->
@@ -41,7 +41,7 @@ pub fn parse_mac(
     Ok(b)
 }
 
-// parse une IPv4 string -> Ipv4Addr
+/// parse une IPv4 string -> Ipv4Addr
 pub fn parse_ipv4(
     ip: &str
 ) -> 
@@ -76,7 +76,8 @@ Result<
     )
 }
 
-// parse une hex string -> u8
+
+/// parse une hex string -> u8
 pub fn parse_hex(
     octets: &str
 ) -> 

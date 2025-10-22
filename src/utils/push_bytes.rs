@@ -8,7 +8,7 @@
 /// https://doc.rust-lang.org/std/primitive.slice.html
 /////////////////////////////////////////////////////////
  
-
+/// Fonction push_bytes redev
 pub fn push_bytes(
     buf: &mut [
         u8

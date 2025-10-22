@@ -1,7 +1,13 @@
+//////////////////////////////////////////////
+/// network_packet.rs
+/// Definition d'un paquet reseau complet
+/////////////////////////////////////////////////
+
 use crate::structs::ethernet::EthernetHeader;
 use crate::structs::ip::Ipv4Header;
 use crate::structs::l4_protocol::L4Data;
 
+/// Definition d'un paquet reseau complet
 #[derive(Debug, Clone)]
 pub struct NetworkPacket {
     pub ethernet: EthernetHeader,

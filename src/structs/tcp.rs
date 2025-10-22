@@ -1,3 +1,12 @@
+/////////////////////////////////////////////////
+/// Definition de l'header TCP
+/// https://tools.ietf.org/html/rfc793
+/// Structure presente a header TCP.
+
+use alloc::vec::Vec;
+
+/// Definition de l'header TCP
+/// Contient les infos du header.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TcpHeader {
     pub src_port: u16,

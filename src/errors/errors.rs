@@ -1,46 +1,122 @@
-use displaydoc::Display;
-use thiserror::Error;
+/////////////////////////////////////////////////////////////////
+/// errors.rs
+/// Definition des erreurs de parsing reseau personnalise
+//////////////////////////////////////////////////////////////////
 
-pub type Result
-<
-    T
-> = core::result::Result
-<
-    T, 
-    ParseError
->;
+use crate::prelude::*;
 
+/// Resultat format parsing réseau
+pub type Result<T> = core::result::Result<T, ParseError>;
+
+/// Erreur de parsing reseau personnalise 
 #[derive(
-    Display, 
     Debug, 
-    Error, 
     PartialEq, 
     Eq
 )]
 pub enum ParseError {
-    /// Invalid MAC address
     InvalidMac,
-    /// Invalid IPv4 address
     InvalidIpv4,
-    /// Too many octets in IPv4
     TooManyOctets,
-    /// Not enough octets in IPv4
     NotEnoughOctets,
-    /// Invalid hex value
     InvalidHex,
-    /// Invalid length
     InvalidLength,
-    /// Invalid length bytes
-    InvalidLengthBytes {
-        size : usize
+    InvalidLengthBytes { 
+        size: usize 
     },
-    /// Value too large to fit in requested size
     ValueTooLarge { 
         value: u64, 
         size: usize 
     },
-    /// Missing required field
     MissingRequiredField(
         &'static str
     ),
+    InvalidFormat(
+        &'static str
+    ),
+    IoError(
+        StringNoStd
+    ),
+    JsonError(
+        StringNoStd
+    ),
+}
+
+/// Affichage des erreur lisible de parsing reseau explicite
+impl fmt::Display for ParseError {
+    fn fmt(
+        &self, 
+        f: &mut fmt::Formatter<'_>
+    ) -> fmt::Result {
+        match self {
+            ParseError::InvalidMac => write!(
+                f, 
+                "Invalid MAC address"
+            ),
+            ParseError::InvalidIpv4 => write!(
+                f, 
+                "Invalid IPv4 address"
+            ),
+            ParseError::TooManyOctets => write!(
+                f,
+                "Too many octets in IPv4"
+            ),
+            ParseError::NotEnoughOctets => write!(
+                f, 
+                "Not enough octets in IPv4"
+            ),
+            ParseError::InvalidHex => write!(
+                f, 
+                "Invalid hex value"
+            ),
+            ParseError::InvalidLength => write!(
+                f, 
+                "Invalid length"
+            ),
+            ParseError::InvalidLengthBytes { 
+                size 
+            } => write!(
+                f, 
+                "Invalid length bytes size={}", 
+                size
+            ),
+            ParseError::ValueTooLarge { 
+                value, 
+                size 
+            } => write!(
+                f, 
+                "Value {} too large for size {}", 
+                value, 
+                size
+            ),
+            ParseError::MissingRequiredField(
+                name
+            ) => write!(
+                f, 
+                "Missing required field {}", 
+                name
+            ),
+            ParseError::InvalidFormat(
+                msg
+            ) => write!(
+                f, 
+                "Invalid format: {}", 
+                msg
+            ),
+            ParseError::IoError(
+                msg
+            ) => write!(
+                f, 
+                "IO error: {}", 
+                msg
+            ),
+            ParseError::JsonError(
+                msg
+            ) => write!(
+                f, 
+                "JSON error: {}", 
+                msg
+            ),
+        }
+    }
 }

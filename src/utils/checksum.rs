@@ -34,7 +34,7 @@
 */
 
 
-
+/// Calcule le checksum.
 
 pub fn internet_checksum(
     data: &[u8]

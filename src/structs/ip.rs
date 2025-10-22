@@ -3,6 +3,9 @@
 /// 
 /// Structure presente a header IPv4.
 
+use alloc::vec::Vec as VacNoStd;
+
+/// Definition de l'header IPV4
 #[derive(Debug, Clone)]
 pub struct Ipv4Header {
     pub version: u8,            
@@ -17,5 +20,5 @@ pub struct Ipv4Header {
     pub header_checksum: u16,   
     pub src_addr: [u8; 4],      
     pub dst_addr: [u8; 4],      
-    pub options: Option<Vec<u8>>,
+    pub options: Option<VacNoStd<u8>>,
 }

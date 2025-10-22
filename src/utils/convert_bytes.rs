@@ -4,6 +4,8 @@
 /// Cette fonction a est develloper pour eviter l’utilisation de fonctions haut niveau
 /// et de la librairie standard std, comme to_be_bytes ou copy_from_slice
 
+use crate::prelude::*;
+
 use crate::errors::errors::{
     Result,
     ParseError::{
@@ -12,7 +14,7 @@ use crate::errors::errors::{
     }
 };
 
-pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<Vec<u8>> {
+pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<VecNoStd<u8>> {
     
     if size == 1 {
         let byte = (value.into() & 0xFF) as u8;
