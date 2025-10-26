@@ -1,6 +1,7 @@
 use projet_rsns_morissetlarresacha::{
     structs::packet_builder::PacketBuilder,
-    formats::format_factory::{FormatFactory, FormatType},
+    formats::format_factory::FormatFactory,
+    structs::formats::FormatType,
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

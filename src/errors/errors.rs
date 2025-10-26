@@ -4,6 +4,10 @@
 //////////////////////////////////////////////////////////////////
 
 use crate::prelude::*;
+use alloc::format;
+
+#[cfg(feature = "std")]
+use std::error::Error;
 
 /// Resultat format parsing réseau
 pub type Result<T> = core::result::Result<T, ParseError>;
@@ -38,6 +42,9 @@ pub enum ParseError {
         StringNoStd
     ),
     JsonError(
+        StringNoStd
+    ),
+    SerdeError(
         StringNoStd
     ),
 }
@@ -117,6 +124,28 @@ impl fmt::Display for ParseError {
                 "JSON error: {}", 
                 msg
             ),
+            ParseError::SerdeError(
+                msg
+            ) => write!(
+                f, 
+                "Serde error: {}", 
+                msg
+            ),
         }
     }
 }
+
+impl From<serde_json_core::ser::Error> for ParseError {
+    fn from(err: serde_json_core::ser::Error) -> Self {
+        ParseError::SerdeError(format!("Serialization error: {:?}", err))
+    }
+}
+
+impl From<serde_json_core::de::Error> for ParseError {
+    fn from(err: serde_json_core::de::Error) -> Self {
+        ParseError::SerdeError(format!("Deserialization error: {:?}", err))
+    }
+}
+
+#[cfg(feature = "std")]
+impl Error for ParseError {}

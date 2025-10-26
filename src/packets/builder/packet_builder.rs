@@ -5,7 +5,7 @@ use crate::{
         packet_builder::PacketBuilder,
     },
     parsing::my_parser::parse_ipv4,
-    errors::errors::{Result, ParseError},
+    errors::errors::Result,
 };
 
 
@@ -34,13 +34,17 @@ impl PacketBuilder {
         ip_bitfield: Option<u8>,
         payload: Option<Vec<u8>>,
     ) -> Result<Self> {
-        let src_ip = parse_ipv4(
-            src_ip.ok_or(ParseError::MissingRequiredField("src_ip"))?
-        )?;
+        let src_ip = if let Some(ip) = src_ip {
+            parse_ipv4(ip)?
+        } else {
+            parse_ipv4("192.168.1.100")? // IP par défaut
+        };
 
-        let dst_ip = parse_ipv4(
-            dst_ip.ok_or(ParseError::MissingRequiredField("dst_ip"))?
-        )?;
+        let dst_ip = if let Some(ip) = dst_ip {
+            parse_ipv4(ip)?
+        } else {
+            parse_ipv4("192.168.1.1")? // IP par défaut
+        };
 
         let src_mac = src_mac.unwrap_or([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
         let dst_mac = dst_mac.unwrap_or([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);

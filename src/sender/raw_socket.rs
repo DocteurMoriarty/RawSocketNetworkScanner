@@ -1,7 +1,9 @@
 use crate::errors::errors::Result;
+use crate::prelude::*;
+use core::mem;
 
 pub struct RawSocketSender {
-    fd: std::os::fd::RawFd,
+    fd: libc::c_int,
 }
 
 impl RawSocketSender {
@@ -25,7 +27,7 @@ impl RawSocketSender {
                     libc::SOL_SOCKET,
                     libc::SO_SNDTIMEO,
                     &tv as *const _ as *const libc::c_void,
-                    std::mem::size_of::<libc::timeval>() as libc::socklen_t,
+                    mem::size_of::<libc::timeval>() as libc::socklen_t,
                 )
             };
             if ret < 0 {
@@ -54,7 +56,7 @@ impl RawSocketSender {
                 packet.len(),
                 0,
                 &saddr as *const _ as *const libc::sockaddr,
-                std::mem::size_of::<libc::sockaddr_ll>() as libc::socklen_t,
+                mem::size_of::<libc::sockaddr_ll>() as libc::socklen_t,
             )
         };
         if ret < 0 {
@@ -71,7 +73,7 @@ impl Drop for RawSocketSender {
 }
 
 pub fn get_interface_index(name: &str) -> Result<i32> {
-    use std::ffi::CString;
+    use alloc::ffi::CString;
     let c_name = CString::new(name).unwrap();
     let fd = unsafe { libc::socket(libc::AF_PACKET, libc::SOCK_RAW, (libc::ETH_P_ALL as u16).to_be() as i32) };
     if fd < 0 {

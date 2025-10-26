@@ -1,71 +1,14 @@
-use serde_json_core::ser::to_string;
-use serde_json_core::heapless::String as HString;
-use crate::utils::format_mac::mac_to_string;
-use crate::prelude::*;
-
 use crate::{
     structs::network_packet::NetworkPacket,
     structs::l4_protocol::L4Data,
+    structs::json::{JsonPacket, JsonEthernet, JsonIpv4, JsonL4, JsonMetadata, JsonValue, JsonSerializer, JsonDeserializer},
     errors::errors::Result,
+    prelude::*,
 };
-use serde::{Serialize, Deserialize};
 use serde_json_core;
+use alloc::format;
 
-// Enum pour remplacer serde_json::Value
-#[derive(Serialize, Deserialize, Debug)]
-pub enum JsonValue {
-    U64(u64),
-    Bool(bool),
-    String(StringNoStd),
-}
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonPacket {
-    pub ethernet: JsonEthernet,
-    pub ipv4: JsonIpv4,
-    pub l4: JsonL4,
-    pub metadata: JsonMetadata,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonEthernet {
-    pub src_mac: StringNoStd,
-    pub dst_mac: StringNoStd,
-    pub ethertype: u16,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonIpv4 {
-    pub src_addr: StringNoStd,
-    pub dst_addr: StringNoStd,
-    pub protocol: u8,
-    pub total_length: u16,
-    pub header_checksum: u16,
-    pub ttl: u8,
-    pub flags: u8,
-    pub fragment_offset: u16,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonL4 {
-    pub protocol_type: StringNoStd,
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub payload_size: usize,
-    pub checksum: u16,
-    pub additional_fields: BTreeMap<StringNoStd, JsonValue>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonMetadata {
-    pub packet_size: usize,
-    pub timestamp: u64, 
-    pub raw_data: StringNoStd,
-}
-
-pub struct JsonSerializer {
-    include_raw_data: bool,
-}
 
 impl JsonSerializer {
     pub fn new() -> Self { Self { include_raw_data: true } }
@@ -73,28 +16,21 @@ impl JsonSerializer {
 
     pub fn serialize_packet(&self, packet: &NetworkPacket) -> Result<StringNoStd> {
         let json_packet = self.convert_to_json_packet(packet)?;
-        let s = serde_json_core::ser::to_string(&json_packet)?;
-        Ok(s.as_str().to_string())
-    }
-
-
-
-    pub fn serialize_packet(&self, packet: &NetworkPacket) -> Result<StringNoStd> {
-        let json_packet = self.convert_to_json_packet(packet)?;
-        let s: HString<4096> = to_string(&json_packet)?;        
-        Ok(s.as_str().to_string())
+        let mut buf = [0u8; 4096];
+        let serialized_len = serde_json_core::ser::to_slice(&json_packet, &mut buf)?;
+        Ok(StringNoStd::from_utf8_lossy(&buf[..serialized_len]).to_string())
     }
 
     fn convert_to_json_packet(&self, packet: &NetworkPacket) -> Result<JsonPacket> {
         let ethernet = JsonEthernet {
-            src_mac: mac_to_string!("{:02X?}", packet.ethernet.src_mac),
-            dst_mac: mac_to_string!("{:02X?}", packet.ethernet.dst_mac),
+            src_mac: format_mac(&packet.ethernet.src_mac),
+            dst_mac: format_mac(&packet.ethernet.dst_mac),
             ethertype: packet.ethernet.ethertype,
         };
 
         let ipv4 = JsonIpv4 {
-            src_addr: mac_to_string!("{}.{}.{}.{}", packet.ipv4.src_addr[0], packet.ipv4.src_addr[1], packet.ipv4.src_addr[2], packet.ipv4.src_addr[3]),
-            dst_addr: mac_to_string!("{}.{}.{}.{}", packet.ipv4.dst_addr[0], packet.ipv4.dst_addr[1], packet.ipv4.dst_addr[2], packet.ipv4.dst_addr[3]),
+            src_addr: format_ip(&packet.ipv4.src_addr),
+            dst_addr: format_ip(&packet.ipv4.dst_addr),
             protocol: packet.ipv4.protocol,
             total_length: packet.ipv4.total_length,
             header_checksum: packet.ipv4.header_checksum,
@@ -137,33 +73,69 @@ impl JsonSerializer {
 
         let raw_data = if self.include_raw_data {
             let packet_bytes = packet.assemble_packet()?;
-            mac_to_string!("{:02X?}", packet_bytes)
+            format_bytes(&packet_bytes)
         } else {
             StringNoStd::new()
         };
 
         let metadata = JsonMetadata {
             packet_size: packet.get_packet_size(),
-            timestamp: packet.get_timestamp_ms(),
+            timestamp: get_timestamp_ms(),
             raw_data,
         };
 
         Ok(JsonPacket { ethernet, ipv4, l4, metadata })
     }
+
+    pub fn serialize_packets(&self, packets: &[NetworkPacket]) -> Result<StringNoStd> {
+        let mut buf = [0u8; 8192];
+        let mut json_packets = VecNoStd::new();
+        for packet in packets {
+            json_packets.push(self.convert_to_json_packet(packet)?);
+        }
+        let serialized_len = serde_json_core::ser::to_slice(&json_packets, &mut buf)?;
+        Ok(StringNoStd::from_utf8_lossy(&buf[..serialized_len]).to_string())
+    }
 }
 
-pub struct JsonDeserializer;
-
 impl JsonDeserializer {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        JsonDeserializer
+    }
 
     pub fn deserialize_packet(&self, json_str: &str) -> Result<JsonPacket> {
-        let (_rest, pkt) = serde_json_core::de::from_str(json_str)?;
-        Ok(pkt)
+        let (packet, _rest) = serde_json_core::de::from_str(json_str)?;
+        Ok(packet)
     }
 
-    pub fn deserialize_packets(&self, json_str: &str) -> Result<Vec<JsonPacket>> {
-        let (_rest, pkts) = serde_json_core::de::from_str(json_str)?;
-        Ok(pkts)
+    pub fn deserialize_packets(&self, json_str: &str) -> Result<VecNoStd<JsonPacket>> {
+        let (packets, _rest) = serde_json_core::de::from_str(json_str)?;
+        Ok(packets)
     }
+}
+
+fn format_mac(mac: &[u8; 6]) -> StringNoStd {
+    format!("{:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}", 
+        mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
+}
+
+fn format_ip(ip: &[u8; 4]) -> StringNoStd {
+    format!("{}.{}.{}.{}", ip[0], ip[1], ip[2], ip[3])
+}
+
+fn format_bytes(bytes: &[u8]) -> StringNoStd {
+    let mut result = StringNoStd::new();
+    for (i, &byte) in bytes.iter().enumerate() {
+        if i > 0 {
+            result.push(' ');
+        }
+        result.push_str(&format!("{:02X}", byte));
+    }
+    result
+}
+
+fn get_timestamp_ms() -> u64 {
+    // En mode no_std, on utilise un timestamp simple
+    // Dans un vrai environnement, on utiliserait un timer hardware
+    0
 }

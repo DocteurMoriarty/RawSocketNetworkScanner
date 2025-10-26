@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["alloc"]
-std = ["alloc"]      
-alloc = []             
+default = ["std"]
+std = ["alloc", "clap", "displaydoc", "thiserror", "serde_json", "chrono", "libc"]
+alloc = []
 
 [dependencies]
 heapless = { version = "0.9.1", default-features = false, features = ["alloc"] }
@@ -14,6 +14,33 @@ serde = { version = "1.0.228", default-features = false, features = ["derive", "
 serde-json-core = { version = "0.6.0", default-features = false }
 time = { version = "0.3.44", default-features = false, features = ["macros", "alloc"] }
 
+[dependencies.clap]
+version = "4.5.48"
+features = ["derive"]
+optional = true
+
+[dependencies.displaydoc]
+version = "0.2.5"
+optional = true
+
+[dependencies.thiserror]
+version = "2.0.17"
+optional = true
+
+[dependencies.serde_json]
+version = "1.0"
+optional = true
+
+[dependencies.chrono]
+version = "0.4"
+features = ["serde"]
+optional = true
+
+[dependencies.libc]
+version = "0.2"
+optional = true
+
 [[bin]]
 name = "projet_rsns_morissetlarresacha"
 path = "src/main.rs"
+required-features = ["std"]

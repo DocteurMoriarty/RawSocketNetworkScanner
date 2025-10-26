@@ -1,11 +1,25 @@
 # RawSocketNetworkScanner
-Projet Rust conçu pour fournir un parseur d'arguments en ligne de commande (CLI) robuste, avec gestion d’erreurs personnalisée et tests unitaires complets. Il permet de manipuler et valider facilement des adresses IPv4, des adresses MAC, des champs hexadécimaux, ainsi que d’autres paramètres réseau de manière sécurisée et maintenable.
+
+Un scanner réseau Rust qui construit et envoie des paquets via raw socket, construisant manuellement les en-têtes L2/L3/L4.
+
+## Instructions de build
+
+### Mode standard (avec std)
+```bash
+cargo build --release
+cargo run -- <options>
+```
+
+### Mode no_std (bibliothèque uniquement)
+```bash
+cargo build --lib --no-default-features --features alloc
+```
 
 ## Exécutions attendues (exemples)
 
 Ces commandes sont supportées individuellement. Les noms des options sont strictement ceux-ci:
 
-```
+```bash
 cargo run -- --src_ip=192.168.25.2
 cargo run -- --dst_ip=192.168.1.25
 cargo run -- --dest_port=8080
@@ -19,7 +33,29 @@ cargo run -- --debug_file=./debug.json --debug_format=json
 cargo run -- --ip_bitfield=0x04 --dry_run
 ```
 
-Notes:
-- `--dry_run` génère uniquement le paquet (et éventuellement un fichier debug), sans envoi réseau.
-- En l’absence de `--dry_run`, l’envoi se fait via raw socket.
-- L’interface utilisée par défaut est interne au programme (aucun flag d’interface requis).
+## Fonctionnalités
+
+- **Construction de paquets** : Ethernet (L2), IPv4 (L3), UDP/TCP (L4) avec checksums corrects
+- **Raw sockets** : Envoi de paquets via raw socket (nécessite privilèges root)
+- **Mode dry_run** : Génération de paquets sans envoi réseau (recommandé pour les tests)
+- **Formats de debug** : JSON et PCAP (compatible Wireshark)
+- **Architecture no_std** : Support des environnements embarqués
+- **Mode silencieux** : Aucune sortie sur stdout (erreurs sur stderr uniquement)
+
+## Privilèges requis
+
+- **Envoi de paquets** : Nécessite les privilèges root (`sudo`) pour créer des raw sockets
+- **Mode dry_run** : Aucun privilège requis (recommandé pour les tests)
+
+## Déclaration éthique
+
+⚠️ **IMPORTANT** : Ce scanner réseau doit être utilisé UNIQUEMENT dans des environnements autorisés. L'utilisation de cet outil sur des réseaux sans autorisation explicite est illégale et contraire à l'éthique. Les développeurs déclarent qu'ils utiliseront cet outil uniquement pour des tests légitimes et autorisés.
+
+## Architecture
+
+Le projet utilise une architecture modulaire avec :
+- **packets/builder** : Construction modulaire des paquets (Ethernet, IPv4, TCP, UDP)
+- **formats** : Sérialisation JSON et PCAP
+- **sender** : Envoi via raw sockets
+- **parsing** : Validation des arguments CLI
+- **no_std** : Support des environnements embarqués

@@ -1,12 +1,9 @@
 use crate::{
     structs::network_packet::NetworkPacket,
+    structs::pcap::{PcapWriter, PcapReader},
     errors::errors::Result,
+    prelude::*,
 };
-use crate::prelude::*;
-use core::fmt::Write;
-pub struct PcapWriter {
-    buffer: VecNoStd<u8>,
-}
 
 impl PcapWriter {
     pub fn new() -> Self {
@@ -24,16 +21,13 @@ impl PcapWriter {
             0xFF, 0xFF, 0x00, 0x00, 
             0x01, 0x00, 0x00, 0x00,
         ];
-        self.buffer.write_all(&global_header)?;
+        self.buffer.extend_from_slice(&global_header);
         Ok(())
     }
 
     pub fn write_packet(&mut self, packet: &NetworkPacket) -> Result<()> {
         let packet_data = packet.assemble_packet()?;
-        let timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let timestamp = get_timestamp();
 
         let packet_header = [
             (timestamp & 0xFFFFFFFF) as u32,
@@ -43,9 +37,9 @@ impl PcapWriter {
         ];
 
         for &value in &packet_header {
-            self.buffer.write_all(&value.to_le_bytes())?;
+            self.buffer.extend_from_slice(&value.to_le_bytes());
         }
-        self.buffer.write_all(&packet_data)?;
+        self.buffer.extend_from_slice(&packet_data);
 
         Ok(())
     }
@@ -57,11 +51,6 @@ impl PcapWriter {
     pub fn into_data(self) -> VecNoStd<u8> {
         self.buffer
     }
-}
-
-pub struct PcapReader {
-    data: VecNoStd<u8>,
-    position: usize,
 }
 
 impl PcapReader {
@@ -137,4 +126,10 @@ impl PcapReader {
     pub fn has_more_packets(&self) -> bool {
         self.position < self.data.len()
     }
+}
+
+fn get_timestamp() -> u64 {
+    // En mode no_std, on utilise un timestamp simple
+    // Dans un vrai environnement, on utiliserait un timer hardware
+    0
 }
