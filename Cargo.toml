@@ -9,7 +9,6 @@ std = ["alloc", "clap", "displaydoc", "thiserror", "serde_json", "chrono", "libc
 alloc = []
 
 [dependencies]
-heapless = { version = "0.9.1", default-features = false, features = ["alloc"] }
 serde = { version = "1.0.228", default-features = false, features = ["derive", "alloc"] }
 serde-json-core = { version = "0.6.0", default-features = false }
 time = { version = "0.3.44", default-features = false, features = ["macros", "alloc"] }
