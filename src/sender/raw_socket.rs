@@ -2,15 +2,18 @@ use crate::errors::errors::Result;
 use crate::prelude::*;
 use core::mem;
 
-pub struct RawSocketSender {
-    fd: libc::c_int,
-}
-
 impl RawSocketSender {
     pub fn new() -> Result<Self> {
-        let fd = unsafe { libc::socket(libc::AF_PACKET, libc::SOCK_RAW, (libc::ETH_P_ALL as u16).to_be() as i32) };
+        let fd = unsafe {
+            libc::socket(
+                libc::AF_PACKET,
+                libc::SOCK_RAW,
+                (libc::ETH_P_ALL as u16).to_be() as i32)
+            };
         if fd < 0 {
-            return Err(crate::errors::errors::ParseError::IoError("socket() failed".into()));
+            return Err(
+                crate::errors::errors::ParseError::IoError("socket() failed".into())
+            );
         }
         Ok(Self { fd })
     }
@@ -31,7 +34,9 @@ impl RawSocketSender {
                 )
             };
             if ret < 0 {
-                return Err(crate::errors::errors::ParseError::IoError("setsockopt() failed".into()));
+                return Err(
+                    crate::errors::errors::ParseError::IoError("setsockopt() failed".into())
+                );
             }
         }
         Ok(())
@@ -60,7 +65,9 @@ impl RawSocketSender {
             )
         };
         if ret < 0 {
-            return Err(crate::errors::errors::ParseError::IoError("sendto() failed".into()));
+            return Err(
+                crate::errors::errors::ParseError::IoError("sendto() failed".into())
+            );
         }
         Ok(ret as usize)
     }
@@ -75,14 +82,27 @@ impl Drop for RawSocketSender {
 pub fn get_interface_index(name: &str) -> Result<i32> {
     use alloc::ffi::CString;
     let c_name = CString::new(name).unwrap();
-    let fd = unsafe { libc::socket(libc::AF_PACKET, libc::SOCK_RAW, (libc::ETH_P_ALL as u16).to_be() as i32) };
+    let fd = unsafe {
+        libc::socket(
+            libc::AF_PACKET,
+            libc::SOCK_RAW,
+            (libc::ETH_P_ALL as u16).to_be() as i32)
+        };
     if fd < 0 {
-        return Err(crate::errors::errors::ParseError::IoError("socket() failed".into()));
+        return Err(
+            crate::errors::errors::ParseError::IoError("socket() failed".into()
+        ));
     }
-    let if_index = unsafe { libc::if_nametoindex(c_name.as_ptr()) } as i32;
-    unsafe { libc::close(fd) };
+    let if_index = unsafe {
+        libc::if_nametoindex(c_name.as_ptr())
+    } as i32;
+    unsafe {
+        libc::close(fd)
+    };
     if if_index <= 0 {
-        return Err(crate::errors::errors::ParseError::InvalidFormat("invalid interface name"));
+        return Err(
+            crate::errors::errors::ParseError::InvalidFormat("invalid interface name")
+        );
     }
     Ok(if_index)
 }

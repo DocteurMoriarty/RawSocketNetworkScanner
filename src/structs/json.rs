@@ -49,7 +49,7 @@ pub struct JsonL4 {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JsonMetadata {
     pub packet_size: usize,
-    pub timestamp: u64, 
+    pub timestamp: u64,
     pub raw_data: StringNoStd,
 }
 

@@ -4,8 +4,10 @@ use std::process;
 
 use projet_rsns_morissetlarresacha::cli::Args;
 use projet_rsns_morissetlarresacha::structs::packet_builder::PacketBuilder;
-use projet_rsns_morissetlarresacha::formats::format_factory::FormatFactory;
-use projet_rsns_morissetlarresacha::structs::formats::FormatType;
+use projet_rsns_morissetlarresacha::formats::{
+    format_factory::FormatFactory,
+    formats::FormatType
+};
 use projet_rsns_morissetlarresacha::sender::raw_socket::{RawSocketSender, get_interface_index};
 
 fn main() {
@@ -13,7 +15,7 @@ fn main() {
 
     match build_and_send_packet(&args) {
         Ok(_) => {
-            // Mode silencieux - pas de sortie sur stdout
+
         }
         Err(e) => {
             eprintln!("Erreur: {}", e);
@@ -67,12 +69,12 @@ fn build_and_send_packet(args: &Args) -> Result<(), Box<dyn Error>> {
 fn detect_interface() -> Result<String, Box<dyn Error>> {
     // Essayer de détecter l'interface réseau principale
     let interfaces = ["eth0", "enp0s3", "wlan0", "lo"];
-    
+
     for iface in &interfaces {
         if get_interface_index(iface).is_ok() {
             return Ok(iface.to_string());
         }
     }
-    
+
     Err("Aucune interface réseau disponible".into())
 }

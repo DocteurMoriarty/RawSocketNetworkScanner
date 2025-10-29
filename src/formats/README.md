@@ -1,52 +1,48 @@
-# Architecture modulaire des formats
+# Formats
 
-## Vue d'ensemble
-
-Le module `formats` fournit une architecture modulaire pour la sérialisation et désérialisation des paquets réseau dans différents formats.
+Le module `formats` fournit la sérialisation/désérialisation des paquets réseau en JSON et PCAP, ainsi qu’une fabrique pour produire les implémentations selon un `FormatType`.
 
 ## Structure des modules
 
-### 1. `pcap.rs`
-- **Responsabilité** : Gestion du format PCAP (Packet Capture)
-- **Structs publics** : 
-  - `PcapWriter` : Écriture de fichiers PCAP
-  - `PcapReader` : Lecture de fichiers PCAP
-- **Méthodes principales** :
-  - `PcapWriter::new()` : Création d'un writer PCAP
-  - `write_global_header()` : Écriture de l'en-tête global PCAP
-  - `write_packet(packet)` : Écriture d'un paquet
-  - `PcapReader::new(data)` : Création d'un reader PCAP
-  - `read_global_header()` : Lecture de l'en-tête global
-  - `read_next_packet()` : Lecture du prochain paquet
+### `pcap.rs`
+- **Responsabilité**: Gestion du format PCAP (Packet Capture)
+- **Structures**:
+  - `PcapWriter` — writer PCAP basé sur un `VecNoStd<u8>` interne
+  - `PcapReader` — reader PCAP depuis un buffer
+- **Méthodes principales**:
+  - `PcapWriter::new()` — crée un writer
+  - `write_global_header()` — écrit l’en-tête global PCAP
+  - `write_packet(&NetworkPacket)` — écrit un paquet capturé
+  - `get_data()` — vue sur le buffer interne
+  - `into_data()` — consomme et renvoie le buffer
+  - `PcapReader::new(data)` — crée un reader depuis des octets
+  - `read_global_header()` — lit et valide l’en-tête global
+  - `read_next_packet()` — lit le prochain paquet (octets)
+  - `has_more_packets()` — indique s’il reste des paquets
 
-### 2. `json.rs`
-- **Responsabilité** : Sérialisation/désérialisation JSON
-- **Structs publics** :
-  - `JsonSerializer` : Sérialisation vers JSON
-  - `JsonDeserializer` : Désérialisation depuis JSON
-  - `JsonPacket` : Structure de données JSON
-- **Méthodes principales** :
-  - `JsonSerializer::new()` : Création d'un sérialiseur
-  - `serialize_packet(packet)` : Sérialisation d'un paquet
-  - `serialize_packets(packets)` : Sérialisation de plusieurs paquets
-  - `JsonDeserializer::new()` : Création d'un désérialiseur
-  - `deserialize_packet(json)` : Désérialisation d'un paquet
+### `json.rs`
+- **Responsabilité**: Sérialisation JSON légère (no_std-friendly via `serde_json_core`)
+- **Structures**:
+  - `JsonSerializer` — options de sérialisation (`include_raw_data`)
+  - `JsonDeserializer` — lecture de structures JSON
+  - `JsonPacket`, `JsonEthernet`, `JsonIpv4`, `JsonL4`, `JsonMetadata`, `JsonValue`
+- **Méthodes principales**:
+  - `JsonSerializer::new()` / `without_raw_data()` — configuration
+  - `serialize_packet(&NetworkPacket)` — sérialise un paquet en `StringNoStd`
+  - `serialize_packets(&[NetworkPacket])` — sérialise un tableau de paquets
+  - `JsonDeserializer::new()` — crée un désérialiseur
+  - `deserialize_packet(&str)` — parse un `JsonPacket`
+  - `deserialize_packets(&str)` — parse plusieurs `JsonPacket`
 
-### 3. `format_factory.rs`
-- **Responsabilité** : Factory pattern pour les formats
-- **Struct public** : `FormatFactory`
-- **Enum** : `FormatType` (Pcap, Json)
-- **Traits** : `FormatWriter`, `FormatReader`
-- **Méthodes principales** :
-  - `create_writer(format_type)` : Création d'un writer
-  - `create_reader(format_type, data)` : Création d'un reader
-  - `write_packet(packet, format_type)` : Écriture directe
-  - `write_packets(packets, format_type)` : Écriture multiple
-
-## Avantages de cette architecture
-
-1. **Extensibilité** : Facile d'ajouter de nouveaux formats
-2. **Uniformité** : Interface commune via les traits
-3. **Flexibilité** : Support de formats binaires et textuels
-4. **Réutilisabilité** : Composants modulaires
-5. **Type Safety** : Sécurité des types avec les enums
+### `format_factory.rs`
+- **Responsabilité**: Fabrique et traits communs pour writers/readers
+- **Types**:
+  - `FormatFactory` — point d’entrée pour créer writer/reader
+  - `FormatType` — `Pcap | Json`
+  - `FormatWriter`, `FormatReader` — contrats communs
+- **Méthodes principales**:
+  - `FormatFactory::new()` — crée la fabrique
+  - `create_writer(FormatType)` — `PcapWriter` ou `JsonSerializer`
+  - `create_reader(FormatType, VecNoStd<u8>)` — `PcapReader` ou `JsonDeserializer`
+  - `write_packet(&NetworkPacket, FormatType)` — sérialise un paquet (retourne bytes)
+  - `write_packets(&[NetworkPacket], FormatType)` — sérialise plusieurs paquets

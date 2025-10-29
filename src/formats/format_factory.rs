@@ -5,8 +5,14 @@ use crate::{
 };
 use crate::structs::{
     formats::FormatType,
-    pcap::{PcapReader, PcapWriter},
-    json::{JsonSerializer, JsonDeserializer}
+    pcap::{
+        PcapReader,
+        PcapWriter
+    },
+    json::{
+        JsonSerializer,
+        JsonDeserializer
+    }
 };
 
 pub struct FormatFactory;

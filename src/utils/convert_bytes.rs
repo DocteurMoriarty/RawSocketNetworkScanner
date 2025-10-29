@@ -20,8 +20,8 @@ pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<VecNoS
         let byte = (value.into() & 0xFF) as u8;
         return Ok(vec![byte]);
     }
-    
-    if size != 2 
+
+    if size != 2
     && size != 4 
     && size != 8 
     {
@@ -34,7 +34,7 @@ pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<VecNoS
         );
     }
     let mut bytes = vec![
-        0u8; 
+        0u8;
         size
     ];
     
@@ -45,10 +45,10 @@ pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<VecNoS
         1u64 << (
             size * 8
         )
-    ) 
+    )
     {
         return Err(
-            ValueTooLarge { 
+            ValueTooLarge {
                 value, 
                 size 
             }

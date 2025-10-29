@@ -136,14 +136,22 @@ impl fmt::Display for ParseError {
 }
 
 impl From<serde_json_core::ser::Error> for ParseError {
-    fn from(err: serde_json_core::ser::Error) -> Self {
-        ParseError::SerdeError(format!("Serialization error: {:?}", err))
+    fn from(err:
+        serde_json_core::ser::Error
+    ) -> Self {
+        ParseError::SerdeError(
+            format!("Serialization error: {:?}", err)
+        )
     }
 }
 
 impl From<serde_json_core::de::Error> for ParseError {
-    fn from(err: serde_json_core::de::Error) -> Self {
-        ParseError::SerdeError(format!("Deserialization error: {:?}", err))
+    fn from(err:
+        serde_json_core::de::Error
+    ) -> Self {
+        ParseError::SerdeError(
+            format!("Deserialization error: {:?}", err)
+        )
     }
 }
 

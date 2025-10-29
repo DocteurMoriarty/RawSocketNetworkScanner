@@ -1,16 +1,22 @@
-# Gestion des erreurs personnaliser 
 
-Les erreurs pouvant etre presente dans le projet sont toutes prisent en charges de maniere personnaliser grace a la methode ParseError.
-## Structure du fichier
+### `errors.rs`
 
-### 1. `errors.rs`
-- **Responsabilité** : Gestion des erreurs personnaliser
-- **Enum** : 
-  - `ParseError` : Structure des differentes erreurs possible dans le projet
-- **Méthodes** :
-  - `PcapWriter::new()` : Création d'un writer PCAP
-  - `write_global_header()` : Écriture de l'en-tête global PCAP
-  - `write_packet(packet)` : Écriture d'un paquet
-  - `PcapReader::new(data)` : Création d'un reader PCAP
-  - `read_global_header()` : Lecture de l'en-tête global
-  - `read_next_packet()` : Lecture du prochain paquet
+**Responsabilité** : Gestion des erreurs de parsing réseau
+**Type personnalisé** :
+  - `Result<T>` : Alias pour `core::result::Result<T, ParseError>`
+**Enum** :
+  - `ParseError` : Définit les différentes erreurs possibles :
+    - Adresse MAC ou IPv4 invalide
+    - Trop/pas assez d’octets
+    - Valeur hexadécimale incorrecte
+    - Longueur invalide
+    - Valeur trop grande pour la taille spécifiée
+    - Champ requis manquant
+    - Format incorrect
+    - Erreurs JSON ou Serde
+
+- **Implémentations** :
+  - `fmt::Display` : Affichage lisible des erreurs
+  - `From<serde_json_core::Error>` : Conversion automatique des erreurs Serde
+  - `std::error::Error` (si la feature `std` est activée)
+

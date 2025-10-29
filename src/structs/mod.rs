@@ -9,3 +9,4 @@ pub mod packet_builder;
 pub mod formats;
 pub mod pcap;
 pub mod json;
+pub mod socket;

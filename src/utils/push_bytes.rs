@@ -12,8 +12,8 @@
 pub fn push_bytes(
     buf: &mut [
         u8
-    ], 
-    offset: usize, 
+    ],
+    offset: usize,
     data: &[
         u8
     ]

@@ -1,7 +1,16 @@
 use crate::{
     structs::network_packet::NetworkPacket,
     structs::l4_protocol::L4Data,
-    structs::json::{JsonPacket, JsonEthernet, JsonIpv4, JsonL4, JsonMetadata, JsonValue, JsonSerializer, JsonDeserializer},
+    structs::json::{
+        JsonPacket,
+        JsonEthernet,
+        JsonIpv4,
+        JsonL4,
+        JsonMetadata,
+        JsonValue,
+        JsonSerializer,
+        JsonDeserializer
+    },
     errors::errors::Result,
     prelude::*,
 };
@@ -135,7 +144,5 @@ fn format_bytes(bytes: &[u8]) -> StringNoStd {
 }
 
 fn get_timestamp_ms() -> u64 {
-    // En mode no_std, on utilise un timestamp simple
-    // Dans un vrai environnement, on utiliserait un timer hardware
     0
 }

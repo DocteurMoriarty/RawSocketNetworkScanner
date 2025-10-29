@@ -71,7 +71,9 @@ impl PcapReader {
         ]);
 
         if magic != 0xA1B2C3D4 {
-            return Err(crate::errors::errors::ParseError::InvalidFormat("Invalid PCAP magic number").into());
+            return Err(
+                crate::errors::errors::ParseError::InvalidFormat("Invalid PCAP magic number").into()
+            );
         }
 
         self.position = 24;
@@ -114,7 +116,9 @@ impl PcapReader {
         self.position += 16;
 
         if self.position + caplen as usize > self.data.len() {
-            return Err(crate::errors::errors::ParseError::InvalidFormat("PCAP packet data truncated").into());
+            return Err(
+                crate::errors::errors::ParseError::InvalidFormat("PCAP packet data truncated").into()
+            );
         }
 
         let packet_data = self.data[self.position..self.position + caplen as usize].to_vec();
@@ -129,7 +133,5 @@ impl PcapReader {
 }
 
 fn get_timestamp() -> u64 {
-    // En mode no_std, on utilise un timestamp simple
-    // Dans un vrai environnement, on utiliserait un timer hardware
     0
 }
