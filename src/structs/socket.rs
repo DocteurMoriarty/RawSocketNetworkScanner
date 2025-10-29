@@ -1,3 +1,3 @@
 pub struct RawSocketSender {
-    fd: libc::c_int,
+    pub(crate) fd: libc::c_int,
 }

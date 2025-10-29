@@ -1,4 +1,5 @@
 use crate::errors::errors::Result;
+use crate::structs::socket::RawSocketSender;
 use crate::prelude::*;
 use core::mem;
 
