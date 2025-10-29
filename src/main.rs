@@ -10,9 +10,8 @@ use projet_rsns_morissetlarresacha::structs::{
 use projet_rsns_morissetlarresacha::formats::{
     format_factory::FormatFactory,
 };
-use projet_rsns_morissetlarresacha::sender::raw_socket::{
-    RawSocketSender, get_interface_index
-};
+use projet_rsns_morissetlarresacha::structs::socket::RawSocketSender;
+use projet_rsns_morissetlarresacha::sender::raw_socket::get_interface_index;
 
 fn main() {
     let args = Args::parse_args();
