@@ -46,12 +46,12 @@ mod tests {
 
     #[test]
     fn test_convert_max_values() {
-        // Test u16 max
+        // Test U16
         let value: u16 = 0xFFFF;
         let result = convert_n_to_bytes(value, 2);
         assert_eq!(result, Ok(vec![0xFF, 0xFF]));
 
-        // Test u32 max
+        // Test U32
         let value: u32 = 0xFFFFFFFF;
         let result = convert_n_to_bytes(value, 4);
         assert_eq!(result, Ok(vec![0xFF, 0xFF, 0xFF, 0xFF]));
@@ -101,7 +101,6 @@ mod tests {
 
     #[test]
     fn test_exact_fit_value() {
-        // Valeur qui utilise exactement tous les bits disponibles
         let value: u16 = 0xFFFF;
         let result = convert_n_to_bytes(value, 2);
         assert_eq!(result, Ok(vec![0xFF, 0xFF]));

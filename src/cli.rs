@@ -4,6 +4,7 @@ use clap::Parser;
 use crate::prelude::*;
 use crate::parsing::my_parser::{parse_mac, parse_hex};
 
+/// Arguments de la ligne de commande CLI
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Args {

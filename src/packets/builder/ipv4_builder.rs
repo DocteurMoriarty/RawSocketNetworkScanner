@@ -5,7 +5,10 @@ use crate::{
         l4_protocol::L4Data,
     },
     packets::ip::pack_ipv4,
-    utils::checksum::internet_checksum,
+    utils::{
+        checksum::internet_checksum,
+        payload_size::payload_len
+    },
     errors::errors::Result,
 };
 
@@ -15,6 +18,7 @@ pub struct Ipv4Builder {
     ip_bitfield: u8,
 }
 
+// Implementation de Ipv4Builder
 impl Ipv4Builder {
     pub fn new(
         src_ip: Ipv4Addr, 
@@ -28,6 +32,7 @@ impl Ipv4Builder {
         }
     }
 
+    /// Construit l'header IPv4
     pub fn build_ipv4_header(
         &self, 
         l4_data: &L4Data
@@ -36,8 +41,8 @@ impl Ipv4Builder {
         Ipv4Header
     > {
         let l4_length = match l4_data {
-            L4Data::Tcp(tcp) => tcp.payload.as_ref().map(|p| p.len()).unwrap_or(0) + 20,
-            L4Data::Udp(udp) => udp.payload.as_ref().map(|p| p.len()).unwrap_or(0) + 8,
+            L4Data::Tcp(tcp) => payload_len(&tcp.payload) + 20,
+            L4Data::Udp(udp) => payload_len(&udp.payload) + 8,
         };
         let total_length = 20 + l4_length;
         let mut ipv4_header = Ipv4Header {
@@ -78,6 +83,7 @@ impl Ipv4Builder {
         )
     }
 
+    /// Calcule le checksum de l'header IPv4
     fn calculate_ipv4_checksum(
         &self, 
         ipv4_header: &Ipv4Header
@@ -89,6 +95,10 @@ impl Ipv4Builder {
         temp_header.header_checksum = 0;
         let ip_header_bytes = pack_ipv4(&temp_header, &[])?;
         let header_for_checksum = &ip_header_bytes[..20];
-        Ok(internet_checksum(header_for_checksum))
+        Ok(
+            internet_checksum(
+                header_for_checksum
+            )
+        )
     }
 }

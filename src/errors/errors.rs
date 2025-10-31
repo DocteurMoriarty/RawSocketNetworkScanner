@@ -9,7 +9,7 @@ use alloc::format;
 #[cfg(feature = "std")]
 use std::error::Error;
 
-/// Resultat format parsing réseau
+/// Resultat format parsing reseau
 pub type Result<T> = core::result::Result<T, ParseError>;
 
 /// Erreur de parsing reseau personnalise 
@@ -135,6 +135,10 @@ impl fmt::Display for ParseError {
     }
 }
 
+
+
+// Implementation de From pour convertir une erreur deserde_json_core en une erreur personalisee
+// Serialization
 impl From<serde_json_core::ser::Error> for ParseError {
     fn from(err:
         serde_json_core::ser::Error
@@ -144,7 +148,7 @@ impl From<serde_json_core::ser::Error> for ParseError {
         )
     }
 }
-
+// Deserialization
 impl From<serde_json_core::de::Error> for ParseError {
     fn from(err:
         serde_json_core::de::Error

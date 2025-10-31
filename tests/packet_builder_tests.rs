@@ -14,11 +14,9 @@ mod tests {
             packet_builder::PacketBuilder,
             l4_protocol::{L4Protocol, L4Data},
             ipv4::Ipv4Addr,
-            network_packet::NetworkPacket,
             tcp::TcpHeader,
         },
     };
-    use std::vec::Vec;
 
     ///////////////////////////////////////////
     ///      PacketBuilder Tests             ///
@@ -160,11 +158,9 @@ mod tests {
 
         let packet = factory.build_packet(&builder).unwrap();
 
-        // Vérifier IPv4 avec bitfield
-        assert_eq!(packet.ipv4.protocol, 17); // UDP
-        assert_eq!(packet.ipv4.flags, 0); // Bitfield appliqué
+        assert_eq!(packet.ipv4.protocol, 17);
+        assert_eq!(packet.ipv4.flags, 0);
 
-        // Vérifier UDP
         match &packet.l4_data {
             L4Data::Udp(udp) => {
                 assert_eq!(udp.src_port, 53);
@@ -205,14 +201,12 @@ mod tests {
         let packet_bytes = assembler.assemble_packet(&packet).unwrap();
         let packet_size = assembler.get_packet_size(&packet);
 
-        // Vérifier la taille
         assert_eq!(packet_bytes.len(), packet_size);
         assert!(packet_bytes.len() > 0);
 
-        // Vérifier les premiers octets (Ethernet header)
-        assert_eq!(packet_bytes[0..6], [0x11, 0x22, 0x33, 0x44, 0x55, 0x66]); // dst_mac
-        assert_eq!(packet_bytes[6..12], [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]); // src_mac
-        assert_eq!(packet_bytes[12..14], [0x08, 0x00]); // ethertype
+        assert_eq!(packet_bytes[0..6], [0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
+        assert_eq!(packet_bytes[6..12], [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]);
+        assert_eq!(packet_bytes[12..14], [0x08, 0x00]);
     }
 
     #[test]
@@ -240,12 +234,8 @@ mod tests {
         
         let packet_bytes = assembler.assemble_packet(&packet).unwrap();
         let packet_size = assembler.get_packet_size(&packet);
-
-        // Vérifier la taille
         assert_eq!(packet_bytes.len(), packet_size);
         assert!(packet_bytes.len() > 0);
-
-        // UDP packets should be smaller than TCP
         assert!(packet_bytes.len() < 100);
     }
 
@@ -269,7 +259,7 @@ mod tests {
         assert_eq!(tcp_header.src_port, 8080);
         assert_eq!(tcp_header.dst_port, 443);
         assert_eq!(tcp_header.payload, Some(b"test payload".to_vec()));
-        assert!(tcp_header.checksum > 0); // Checksum calculé
+        assert!(tcp_header.checksum > 0);
     }
 
     #[test]
@@ -288,7 +278,7 @@ mod tests {
         assert_eq!(udp_header.src_port, 53);
         assert_eq!(udp_header.dst_port, 53);
         assert_eq!(udp_header.payload, Some(b"dns query".to_vec()));
-        assert!(udp_header.checksum > 0); // Checksum calculé
+        assert!(udp_header.checksum > 0);
     }
 
     #[test]
@@ -296,7 +286,7 @@ mod tests {
         let ipv4_builder = Ipv4Builder::new(
             Ipv4Addr { octets: [192, 168, 1, 1] },
             Ipv4Addr { octets: [192, 168, 1, 2] },
-            0x04, // Bitfield
+            0x04,
         );
 
         let tcp_header = TcpHeader {
@@ -319,9 +309,9 @@ mod tests {
 
         assert_eq!(ipv4_header.src_addr, [192, 168, 1, 1]);
         assert_eq!(ipv4_header.dst_addr, [192, 168, 1, 2]);
-        assert_eq!(ipv4_header.protocol, 6); // TCP
-        assert_eq!(ipv4_header.flags, 0); // Bitfield appliqué
-        assert!(ipv4_header.header_checksum > 0); // Checksum calculé
+        assert_eq!(ipv4_header.protocol, 6);
+        assert_eq!(ipv4_header.flags, 0); 
+        assert!(ipv4_header.header_checksum > 0);
     }
 
     #[test]
@@ -335,6 +325,6 @@ mod tests {
 
         assert_eq!(ethernet_header.src_mac, [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]);
         assert_eq!(ethernet_header.dst_mac, [0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
-        assert_eq!(ethernet_header.ethertype, 0x0800); // IPv4
+        assert_eq!(ethernet_header.ethertype, 0x0800);
     }
 }

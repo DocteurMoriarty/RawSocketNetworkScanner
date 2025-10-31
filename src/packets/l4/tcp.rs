@@ -9,9 +9,7 @@ use crate::{
     errors::errors::Result,
 };
 
-
-
-
+/// Emballe un header TCP en un vecteur doctets
 pub fn pack_tcp(header: &TcpHeader) -> Result<Vec<u8>> {
     let payload: &[u8];
     if let Some(p) = &header.payload {
@@ -84,8 +82,10 @@ pub fn pack_tcp(header: &TcpHeader) -> Result<Vec<u8>> {
     }
 
     if !payload.is_empty() {
-        offset = push_bytes(&mut packet, offset, payload);
+        push_bytes(&mut packet, offset, payload);
     }
 
-    Ok(packet)
+    Ok(
+        packet
+    )
 }

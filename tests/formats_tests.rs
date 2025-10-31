@@ -14,7 +14,6 @@ mod tests {
             pcap::{PcapWriter, PcapReader},
         },
     };
-    use std::vec::Vec;
 
     ///////////////////////////////////////////
     ///      JSON Format Tests               ///
@@ -98,7 +97,6 @@ mod tests {
         
         let json_str = serializer.serialize_packet(&packet).unwrap();
         
-        // Vérifier que le JSON contient les champs attendus
         assert!(json_str.contains("\"ethernet\""));
         assert!(json_str.contains("\"ipv4\""));
         assert!(json_str.contains("\"l4\""));
@@ -119,7 +117,6 @@ mod tests {
         
         let json_str = serializer.serialize_packet(&packet).unwrap();
         
-        // Vérifier que le JSON contient les champs UDP
         assert!(json_str.contains("\"UDP\""));
         assert!(json_str.contains("\"src_port\":53"));
         assert!(json_str.contains("\"dst_port\":53"));
@@ -134,7 +131,6 @@ mod tests {
         
         let json_str = serializer.serialize_packet(&packet).unwrap();
         
-        // Vérifier que raw_data est vide
         assert!(json_str.contains("\"raw_data\":\"\""));
     }
 
@@ -162,11 +158,7 @@ mod tests {
         writer.write_global_header().unwrap();
         
         let data = writer.get_data();
-        
-        // Vérifier la taille du header global (24 bytes)
         assert_eq!(data.len(), 24);
-        
-        // Vérifier le magic number (little endian)
         assert_eq!(data[0..4], [0xD4, 0xC3, 0xB2, 0xA1]);
     }
 
@@ -180,9 +172,8 @@ mod tests {
         
         let data = writer.get_data();
         
-        // Vérifier que le fichier contient le header global + packet header + packet data
-        assert!(data.len() > 24); // Plus que juste le header global
-        assert!(data.len() < 200); // Raisonnable pour un petit paquet
+        assert!(data.len() > 24);
+        assert!(data.len() < 200);
     }
 
     #[test]
@@ -197,8 +188,7 @@ mod tests {
         
         let data = writer.get_data();
         
-        // Vérifier que le fichier contient plusieurs paquets
-        assert!(data.len() > 100); // Plus grand avec plusieurs paquets
+        assert!(data.len() > 100);
     }
 
     #[test]
@@ -210,7 +200,6 @@ mod tests {
         let mut reader = PcapReader::new(data);
         reader.read_global_header().unwrap();
         
-        // Si on arrive ici sans erreur, le header global est valide
     }
 
     #[test]
@@ -224,11 +213,9 @@ mod tests {
         let mut reader = PcapReader::new(data);
         reader.read_global_header().unwrap();
         
-        // Lire le premier paquet
         let packet_data = reader.read_next_packet().unwrap();
         assert!(packet_data.is_some());
         
-        // Vérifier qu'il n'y a plus de paquets
         let packet_data2 = reader.read_next_packet().unwrap();
         assert!(packet_data2.is_none());
         
@@ -257,10 +244,8 @@ mod tests {
         let factory = FormatFactory::new();
         
         let pcap_data = factory.write_packet(&packet, FormatType::Pcap).unwrap();
-        
-        // Vérifier le magic number PCAP
         assert_eq!(pcap_data[0..4], [0xD4, 0xC3, 0xB2, 0xA1]);
-        assert!(pcap_data.len() > 24); // Plus que juste le header global
+        assert!(pcap_data.len() > 24);
     }
 
     #[test]
@@ -283,9 +268,8 @@ mod tests {
         
         let pcap_data = factory.write_packets(&packets, FormatType::Pcap).unwrap();
         
-        // Vérifier le magic number PCAP
         assert_eq!(pcap_data[0..4], [0xD4, 0xC3, 0xB2, 0xA1]);
-        assert!(pcap_data.len() > 100); // Plus grand avec plusieurs paquets
+        assert!(pcap_data.len() > 100);
     }
 
     ///////////////////////////////////////////
@@ -297,10 +281,8 @@ mod tests {
         let packet = create_test_tcp_packet();
         let serializer = JsonSerializer::new();
         
-        // Sérialiser
         let json_str = serializer.serialize_packet(&packet).unwrap();
         
-        // Vérifier que le JSON est valide (contient les champs attendus)
         assert!(json_str.len() > 100);
         assert!(json_str.contains("\"ethernet\""));
         assert!(json_str.contains("\"ipv4\""));
@@ -313,12 +295,10 @@ mod tests {
         let packet = create_test_tcp_packet();
         let mut writer = PcapWriter::new();
         
-        // Écrire le paquet
         writer.write_global_header().unwrap();
         writer.write_packet(&packet).unwrap();
         let data = writer.into_data();
         
-        // Lire le paquet
         let mut reader = PcapReader::new(data);
         reader.read_global_header().unwrap();
         let packet_data = reader.read_next_packet().unwrap();
@@ -332,20 +312,16 @@ mod tests {
         let packet = create_test_tcp_packet();
         let factory = FormatFactory::new();
         
-        // Générer les deux formats
         let json_data = factory.write_packet(&packet, FormatType::Json).unwrap();
         let pcap_data = factory.write_packet(&packet, FormatType::Pcap).unwrap();
         
-        // Vérifier que les deux formats sont différents mais valides
         assert_ne!(json_data, pcap_data);
         assert!(json_data.len() > 0);
         assert!(pcap_data.len() > 0);
         
-        // JSON doit être du texte
         let json_str = core::str::from_utf8(&json_data).unwrap();
         assert!(json_str.contains("\"ethernet\""));
         
-        // PCAP doit commencer par le magic number
         assert_eq!(pcap_data[0..4], [0xD4, 0xC3, 0xB2, 0xA1]);
     }
 }

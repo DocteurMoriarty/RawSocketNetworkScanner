@@ -25,7 +25,7 @@
         };
 
         let packet = pack_tcp(&header).unwrap();
-        assert_eq!(packet.len(), 20); // header minimal TCP = 20 octets
+        assert_eq!(packet.len(), 20);
     }
 
     #[test]
@@ -47,7 +47,7 @@
         };
 
         let packet = pack_tcp(&header).unwrap();
-        assert_eq!(packet.len(), 25); // 20 + 5
+        assert_eq!(packet.len(), 25);
         assert_eq!(&packet[20..], payload);
     }
 

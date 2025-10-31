@@ -5,20 +5,28 @@ use crate::{
         ipv4::Ipv4Addr,
     },
     packets::l4::tcp::pack_tcp,
-    utils::checksum::internet_checksum,
+    utils::{
+        checksum::internet_checksum,
+        payload_size::payload_len
+    },
     errors::errors::Result,
 };
 
+// Constructeur de paquets TCP
 pub struct TcpBuilder {
     src_ip: Ipv4Addr,
     dst_ip: Ipv4Addr,
 }
 
+// Implementation de TcpBuilder
 impl TcpBuilder {
+
+    // Constructor
     pub fn new(src_ip: Ipv4Addr, dst_ip: Ipv4Addr) -> Self {
         Self { src_ip, dst_ip }
     }
 
+    /// Construit l'header TCP
     pub fn build_tcp_header(
         &self,
         src_port: u16,
@@ -44,13 +52,14 @@ impl TcpBuilder {
         Ok(tcp_header)
     }
 
+    /// Calcule le checksum TCP
     fn calculate_tcp_checksum(&self, tcp_header: &TcpHeader) -> Result<u16> {
         let mut pseudo_header = Vec::new();
         pseudo_header.extend_from_slice(&self.src_ip.octets);
         pseudo_header.extend_from_slice(&self.dst_ip.octets);
         pseudo_header.push(0);
         pseudo_header.push(6);
-        let tcp_length = 20 + tcp_header.payload.as_ref().map(|p| p.len()).unwrap_or(0);
+        let tcp_length = 20 + payload_len(&tcp_header.payload);
         pseudo_header.extend_from_slice(&(tcp_length as u16).to_be_bytes());
 
         let tcp_segment = pack_tcp(tcp_header)?;
@@ -58,6 +67,8 @@ impl TcpBuilder {
         let mut checksum_data = pseudo_header;
         checksum_data.extend_from_slice(&tcp_segment);
 
-        Ok(internet_checksum(&checksum_data))
+        Ok(
+            internet_checksum(&checksum_data)
+        )
     }
 }

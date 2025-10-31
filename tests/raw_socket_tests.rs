@@ -2,7 +2,6 @@
 #[cfg(test)]
 mod tests {
     use projet_rsns_morissetlarresacha::{
-        sender::raw_socket::{RawSocketSender, get_interface_index},
         structs::{
             network_packet::NetworkPacket,
             ethernet::EthernetHeader,
@@ -11,7 +10,9 @@ mod tests {
             l4_protocol::L4Data,
         },
     };
-    use std::vec::Vec;
+
+    use projet_rsns_morissetlarresacha::structs::socket::RawSocketSender;
+    use projet_rsns_morissetlarresacha::sender::raw_socket::get_interface_index;
 
     ///////////////////////////////////////////
     ///      Raw Socket Tests               ///
@@ -58,25 +59,17 @@ mod tests {
 
     #[test]
     fn test_raw_socket_creation() {
-        // Test de création du socket (peut échouer sans privilèges root)
         let result = RawSocketSender::new();
-        
-        // Si ça réussit, on a les privilèges root
         if let Ok(_sender) = result {
-            // Le socket a été créé avec succès
-            // Note: on ne peut pas accéder à sender.fd car c'est privé
         }
-        // Si ça échoue, c'est normal sans privilèges root
     }
 
     #[test]
     fn test_raw_socket_timeout() {
         if let Ok(sender) = RawSocketSender::new() {
-            // Test avec timeout
             let result = sender.set_write_timeout(Some(1000)); // 1 seconde
             assert!(result.is_ok());
             
-            // Test sans timeout
             let result = sender.set_write_timeout(None);
             assert!(result.is_ok());
         }
@@ -84,7 +77,6 @@ mod tests {
 
     #[test]
     fn test_interface_index_detection() {
-        // Test avec des interfaces communes
         let interfaces = ["lo", "eth0", "enp0s3", "wlan0"];
         
         for iface in &interfaces {
@@ -98,16 +90,13 @@ mod tests {
 
     #[test]
     fn test_raw_socket_send_dry_run() {
-        // Test de l'envoi en mode dry_run (sans vraiment envoyer)
         let packet = create_test_packet();
         let packet_bytes = packet.assemble_packet().unwrap();
         
         if let Ok(sender) = RawSocketSender::new() {
             if let Ok(if_index) = get_interface_index("lo") {
-                // Essayer d'envoyer sur loopback (plus sûr)
                 let result = sender.send(if_index, packet.ethernet.dst_mac, &packet_bytes);
                 
-                // Peut réussir ou échouer selon les privilèges
                 match result {
                     Ok(bytes_sent) => {
                         assert!(bytes_sent > 0);
@@ -126,20 +115,17 @@ mod tests {
         let packet = create_test_packet();
         let packet_bytes = packet.assemble_packet().unwrap();
         
-        // Vérifier que le paquet assemblé est valide
         assert!(packet_bytes.len() > 0);
-        assert!(packet_bytes.len() < 1000); // Taille raisonnable
+        assert!(packet_bytes.len() < 1000);
         
-        // Vérifier les premiers octets (Ethernet header)
         assert_eq!(packet_bytes[0..6], packet.ethernet.dst_mac);
         assert_eq!(packet_bytes[6..12], packet.ethernet.src_mac);
-        assert_eq!(packet_bytes[12..14], [0x08, 0x00]); // EtherType IPv4
+        assert_eq!(packet_bytes[12..14], [0x08, 0x00]);
     }
 
     #[test]
     fn test_timeout_values() {
         if let Ok(sender) = RawSocketSender::new() {
-            // Test différentes valeurs de timeout
             let timeouts = [100, 500, 1000, 5000];
             
             for timeout in &timeouts {
@@ -151,7 +137,6 @@ mod tests {
 
     #[test]
     fn test_interface_validation() {
-        // Test avec des noms d'interface invalides
         let invalid_interfaces = ["nonexistent", "invalid_interface", ""];
         
         for iface in &invalid_interfaces {
@@ -166,27 +151,22 @@ mod tests {
 
     #[test]
     fn test_full_packet_workflow() {
-        // Créer un paquet complet
         let packet = create_test_packet();
         let packet_bytes = packet.assemble_packet().unwrap();
         
-        // Vérifier que le paquet est valide
         assert!(packet_bytes.len() > 0);
         
-        // Essayer d'envoyer si possible
         if let Ok(sender) = RawSocketSender::new() {
             if let Ok(if_index) = get_interface_index("lo") {
                 sender.set_write_timeout(Some(1000)).unwrap();
                 
                 let result = sender.send(if_index, packet.ethernet.dst_mac, &packet_bytes);
                 
-                // Le résultat peut être Ok ou Err selon les privilèges
                 match result {
                     Ok(bytes_sent) => {
                         assert_eq!(bytes_sent, packet_bytes.len());
                     }
                     Err(_) => {
-                        // Normal sans privilèges root
                     }
                 }
             }
@@ -208,13 +188,11 @@ mod tests {
                     let packet_bytes = packet.assemble_packet().unwrap();
                     let result = sender.send(if_index, packet.ethernet.dst_mac, &packet_bytes);
                     
-                    // Peut réussir ou échouer selon les privilèges
                     match result {
                         Ok(bytes_sent) => {
                             assert_eq!(bytes_sent, packet_bytes.len());
                         }
                         Err(_) => {
-                            // Normal sans privilèges root
                         }
                     }
                 }
@@ -224,14 +202,12 @@ mod tests {
 
     #[test]
     fn test_error_handling() {
-        // Test de gestion d'erreurs avec des données invalides
-        let invalid_data = vec![0u8; 0]; // Données vides
+        let invalid_data = vec![0u8; 0];
         
         if let Ok(sender) = RawSocketSender::new() {
             if let Ok(if_index) = get_interface_index("lo") {
                 let result = sender.send(if_index, [0xFF; 6], &invalid_data);
                 
-                // Doit échouer avec des données vides
                 assert!(result.is_err());
             }
         }

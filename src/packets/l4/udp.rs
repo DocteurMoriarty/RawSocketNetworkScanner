@@ -11,6 +11,7 @@ use crate::{
     }
 };
 
+/// Emballe un header UDP en un vecteur doctets
 pub fn pack_udp(header: &UdpHeader) -> Result<Vec<u8>> {
     let payload: &[u8];
     if let Some(p) = &header.payload {
@@ -47,7 +48,7 @@ pub fn pack_udp(header: &UdpHeader) -> Result<Vec<u8>> {
         );
     }
 
-    offset = push_bytes(
+    push_bytes(
         &mut packet, 
         offset, 
         payload

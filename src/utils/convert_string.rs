@@ -1,6 +1,6 @@
 use alloc::string::String;
 
-
+/// Convertit une Option<String> en Option<&str>
 pub fn my_as_deref(
     opt: &Option<String>
 ) ->

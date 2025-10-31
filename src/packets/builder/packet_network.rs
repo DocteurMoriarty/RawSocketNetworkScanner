@@ -4,6 +4,7 @@ use crate::{
     errors::errors::Result,
 };
 
+// Extension de NetworkPacket pour l'assemblage
 impl NetworkPacket {
     pub fn assemble_packet(
         &self

@@ -9,6 +9,7 @@ pub enum JsonValue {
     String(StringNoStd),
 }
 
+// Structs pour seria JSON
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JsonPacket {
     pub ethernet: JsonEthernet,
@@ -17,6 +18,7 @@ pub struct JsonPacket {
     pub metadata: JsonMetadata,
 }
 
+// Struct Ethernet
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JsonEthernet {
     pub src_mac: StringNoStd,
@@ -24,6 +26,7 @@ pub struct JsonEthernet {
     pub ethertype: u16,
 }
 
+// Struct IPv4
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JsonIpv4 {
     pub src_addr: StringNoStd,
@@ -36,6 +39,7 @@ pub struct JsonIpv4 {
     pub fragment_offset: u16,
 }
 
+// Struct L4
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JsonL4 {
     pub protocol_type: StringNoStd,
@@ -46,6 +50,7 @@ pub struct JsonL4 {
     pub additional_fields: BTreeMap<StringNoStd, JsonValue>,
 }
 
+// Struct Metadata
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JsonMetadata {
     pub packet_size: usize,
@@ -53,8 +58,10 @@ pub struct JsonMetadata {
     pub raw_data: StringNoStd,
 }
 
+// Serializer et Deserializer JSON
 pub struct JsonSerializer {
     pub include_raw_data: bool,
 }
 
+// Deserializer JSON
 pub struct JsonDeserializer;

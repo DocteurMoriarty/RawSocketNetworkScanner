@@ -9,6 +9,7 @@ use crate::{
     errors::errors::Result,
 };
 
+/// Emballe un header IPv4 en un vecteur doctets
 pub fn pack_ipv4(
     header: &Ipv4Header, 
     payload: &[u8]
@@ -73,7 +74,7 @@ Result<
         offset = push_bytes(&mut packet, offset, options);
     }
 
-    offset = push_bytes(&mut packet, offset, payload);
+    push_bytes(&mut packet, offset, payload);
 
     Ok(packet)
 }

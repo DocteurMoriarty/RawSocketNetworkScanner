@@ -1,9 +1,11 @@
 use crate::errors::errors::Result;
 use crate::structs::socket::RawSocketSender;
-use crate::prelude::*;
 use core::mem;
 
+// Envoie de paquets via un raw socket
 impl RawSocketSender {
+    
+    // Constructor
     pub fn new() -> Result<Self> {
         let fd = unsafe {
             libc::socket(
@@ -13,12 +15,15 @@ impl RawSocketSender {
             };
         if fd < 0 {
             return Err(
-                crate::errors::errors::ParseError::IoError("socket() failed".into())
+                crate::errors::errors::ParseError::IoError(
+                    "socket() failed".into()
+                )
             );
         }
         Ok(Self { fd })
     }
 
+    // Definit le timeout décriture du socket
     pub fn set_write_timeout(&self, timeout_ms: Option<u64>) -> Result<()> {
         if let Some(ms) = timeout_ms {
             let tv = libc::timeval {
@@ -36,7 +41,9 @@ impl RawSocketSender {
             };
             if ret < 0 {
                 return Err(
-                    crate::errors::errors::ParseError::IoError("setsockopt() failed".into())
+                    crate::errors::errors::ParseError::IoError(
+                        "setsockopt() failed".into()
+                    )
                 );
             }
         }
@@ -67,19 +74,25 @@ impl RawSocketSender {
         };
         if ret < 0 {
             return Err(
-                crate::errors::errors::ParseError::IoError("sendto() failed".into())
+                crate::errors::errors::ParseError::IoError(
+                    "sendto() failed".into()
+                )
             );
         }
-        Ok(ret as usize)
+        Ok(
+            ret as usize
+        )
     }
 }
 
+// Implémentation de RawSocketSender
 impl Drop for RawSocketSender {
     fn drop(&mut self) {
         unsafe { libc::close(self.fd) };
     }
 }
 
+// Obtient lindice de linterface réseau par son nom
 pub fn get_interface_index(name: &str) -> Result<i32> {
     use alloc::ffi::CString;
     let c_name = CString::new(name).unwrap();
@@ -91,7 +104,8 @@ pub fn get_interface_index(name: &str) -> Result<i32> {
         };
     if fd < 0 {
         return Err(
-            crate::errors::errors::ParseError::IoError("socket() failed".into()
+            crate::errors::errors::ParseError::IoError(
+                "socket() failed".into()
         ));
     }
     let if_index = unsafe {
@@ -102,10 +116,14 @@ pub fn get_interface_index(name: &str) -> Result<i32> {
     };
     if if_index <= 0 {
         return Err(
-            crate::errors::errors::ParseError::InvalidFormat("invalid interface name")
+            crate::errors::errors::ParseError::InvalidFormat(
+                "invalid interface name"
+            )
         );
     }
-    Ok(if_index)
+    Ok(
+        if_index
+    )
 }
 
 

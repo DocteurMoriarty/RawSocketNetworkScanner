@@ -10,6 +10,7 @@ use crate::{
     errors::errors::{Result, ParseError},
 };
 
+// Fabrique de paquets réseau
 pub struct PacketFactory {
     tcp_builder: super::tcp_builder::TcpBuilder,
     udp_builder: super::udp_builder::UdpBuilder,
@@ -17,7 +18,10 @@ pub struct PacketFactory {
     ethernet_builder: super::ethernet_builder::EthernetBuilder,
 }
 
+// Implementation de PacketFactory
 impl PacketFactory {
+
+    // Constructor
     pub fn new(src_ip: Ipv4Addr, dst_ip: Ipv4Addr, ip_bitfield: u8) -> Self {
         Self {
             tcp_builder: super::tcp_builder::TcpBuilder::new(src_ip, dst_ip),
@@ -27,6 +31,7 @@ impl PacketFactory {
         }
     }
 
+    /// Construit un paquet reseau complet à partir des information du PacketBuilder
     pub fn build_packet(&self, builder: &PacketBuilder) -> Result<NetworkPacket> {
         let l4_data = match builder.protocol {
             L4Protocol::Tcp => {
@@ -72,11 +77,15 @@ impl PacketFactory {
         payload: Option<Vec<u8>>,
     ) -> Result<(Self, PacketBuilder)> {
         let src_ip = parse_ipv4(
-            src_ip.ok_or(ParseError::MissingRequiredField("src_ip"))?
+            src_ip.ok_or(
+                ParseError::MissingRequiredField("src_ip")
+            )?
         )?;
 
         let dst_ip = parse_ipv4(
-            dst_ip.ok_or(ParseError::MissingRequiredField("dst_ip"))?
+            dst_ip.ok_or(
+                ParseError::MissingRequiredField("dst_ip")
+            )?
         )?;
 
         let src_mac = src_mac.unwrap_or([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
@@ -105,6 +114,11 @@ impl PacketFactory {
 
         let factory = Self::new(src_ip, dst_ip, ip_bitfield);
 
-        Ok((factory, packet_builder))
+        Ok(
+            (
+                factory, 
+                packet_builder
+            )
+        )
     }
 }

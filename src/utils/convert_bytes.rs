@@ -14,6 +14,7 @@ use crate::errors::errors::{
     }
 };
 
+/// Convertit un nombre en un vecteur d’octets de taille spécifiée (2, 4 ou 8 octets) en format Big Endian.
 pub fn convert_n_to_bytes <T: Into<u64>>(value: T, size: usize) -> Result<VecNoStd<u8>> {
     
     if size == 1 {

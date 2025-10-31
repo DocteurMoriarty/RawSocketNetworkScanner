@@ -1,5 +1,3 @@
-use crate::prelude::*;
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum FormatType {
     Pcap,

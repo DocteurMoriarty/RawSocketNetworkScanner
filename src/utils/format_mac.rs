@@ -2,6 +2,7 @@ use crate::prelude::*;
 use core::fmt::Write;
 use crate::errors::errors::Result;
 
+/// Convertit une adresse MAC en chaîne de caractères formatée
 pub fn mac_to_string(
     mac: &[u8; 6]
 ) -> Result<StringNoStd> {

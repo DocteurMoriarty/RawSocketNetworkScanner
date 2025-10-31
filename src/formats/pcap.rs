@@ -1,17 +1,22 @@
 use crate::{
+    utils::formating_types::get_timestamp_ms,
     structs::network_packet::NetworkPacket,
     structs::pcap::{PcapWriter, PcapReader},
     errors::errors::Result,
     prelude::*,
 };
 
+// Implémentation des fonctions pour cree des fichiers PCAP
 impl PcapWriter {
+
+    /// Constructeur
     pub fn new() -> Self {
         Self {
             buffer: VecNoStd::new(),
         }
     }
 
+    /// Ecrit l'entete global du fichier PCAP
     pub fn write_global_header(&mut self) -> Result<()> {
         let global_header = [
             0xD4, 0xC3, 0xB2, 0xA1, 
@@ -25,9 +30,10 @@ impl PcapWriter {
         Ok(())
     }
 
+    // Ecrit un paquet dans le fichier PCAP
     pub fn write_packet(&mut self, packet: &NetworkPacket) -> Result<()> {
         let packet_data = packet.assemble_packet()?;
-        let timestamp = get_timestamp();
+        let timestamp = get_timestamp_ms();
 
         let packet_header = [
             (timestamp & 0xFFFFFFFF) as u32,
@@ -44,15 +50,18 @@ impl PcapWriter {
         Ok(())
     }
 
+    // Obtient les donnees du fichier PCAP
     pub fn get_data(&self) -> &[u8] {
         &self.buffer
     }
 
+    // retourne le PCAP
     pub fn into_data(self) -> VecNoStd<u8> {
         self.buffer
     }
 }
 
+// Implementation des fonctions pour lire des fichiers PCAP
 impl PcapReader {
     pub fn new(data: VecNoStd<u8>) -> Self {
         Self {
@@ -61,18 +70,27 @@ impl PcapReader {
         }
     }
 
+    // Lit l'entete global du fichier PCAP
     pub fn read_global_header(&mut self) -> Result<()> {
         if self.data.len() < 24 {
-            return Err(crate::errors::errors::ParseError::InvalidFormat("PCAP header too short").into());
+            return Err(
+                crate::errors::errors::ParseError::InvalidFormat(
+                    "PCAP header too short"
+                ).into()
+            );
         }
 
+        // Verifie le magic number
         let magic = u32::from_le_bytes([
             self.data[0], self.data[1], self.data[2], self.data[3]
         ]);
 
+        // format little-endian
         if magic != 0xA1B2C3D4 {
             return Err(
-                crate::errors::errors::ParseError::InvalidFormat("Invalid PCAP magic number").into()
+                crate::errors::errors::ParseError::InvalidFormat(
+                    "Invalid PCAP magic number"
+                ).into()
             );
         }
 
@@ -80,6 +98,7 @@ impl PcapReader {
         Ok(())
     }
 
+    // Lit le paquet suivant dans le fichier PCAP
     pub fn read_next_packet(&mut self) -> Result<Option<VecNoStd<u8>>> {
         if self.position + 16 > self.data.len() {
             return Ok(None);
@@ -117,21 +136,24 @@ impl PcapReader {
 
         if self.position + caplen as usize > self.data.len() {
             return Err(
-                crate::errors::errors::ParseError::InvalidFormat("PCAP packet data truncated").into()
+                crate::errors::errors::ParseError::InvalidFormat(
+                    "PCAP packet data truncated"
+                ).into()
             );
         }
 
         let packet_data = self.data[self.position..self.position + caplen as usize].to_vec();
         self.position += caplen as usize;
 
-        Ok(Some(packet_data))
+        Ok(
+            Some(
+                packet_data
+            )
+        )
     }
 
+    // Verifie packet valide read
     pub fn has_more_packets(&self) -> bool {
         self.position < self.data.len()
     }
-}
-
-fn get_timestamp() -> u64 {
-    0
 }

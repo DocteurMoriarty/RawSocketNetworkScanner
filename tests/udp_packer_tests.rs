@@ -25,23 +25,21 @@ fn test_udp_pack_minimal() {
 fn test_udp_pack_with_payload() {
     let payload = b"hello";
     let header = UdpHeader {
-        src_port: 53,          // 0x0035
-        dst_port: 5555,        // 0x15B3
+        src_port: 53,
+        dst_port: 5555,
         length: (8 + payload.len()) as u16,
-        checksum: 0xBEEF,      // 0xBEEF → [0xBE, 0xEF]
+        checksum: 0xBEEF,
         payload: Some(payload.to_vec()),
     };
 
     let packet = pack_udp(&header).unwrap();
 
-    // Header (8) + payload (5)
     assert_eq!(packet.len(), 13);
     assert_eq!(&packet[8..], payload);
 
-    // Vérifie ports et checksum en Big Endian
-    assert_eq!(&packet[0..2], &[0x00, 0x35]); // src_port = 53
-    assert_eq!(&packet[2..4], &[0x15, 0xB3]); // dst_port = 5555
-    assert_eq!(&packet[6..8], &[0xBE, 0xEF]); // checksum = 0xBEEF
+    assert_eq!(&packet[0..2], &[0x00, 0x35]);
+    assert_eq!(&packet[2..4], &[0x15, 0xB3]);
+    assert_eq!(&packet[6..8], &[0xBE, 0xEF]);
 }
 
 

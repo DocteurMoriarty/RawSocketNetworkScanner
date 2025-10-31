@@ -9,6 +9,7 @@ use crate::{
     errors::errors::Result,
 };
 
+// Emballe un header Ethernet en un vecteur doctets
 pub fn pack_ethernet(
     header: &EthernetHeader, 
     payload: &[u8]
@@ -47,7 +48,7 @@ Result<
         &ethertype_bytes
     );
 
-    offset = push_bytes(
+    push_bytes(
         &mut packet, 
         offset, 
         payload

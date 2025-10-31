@@ -5,16 +5,23 @@ use crate::{
         ipv4::Ipv4Addr,
     },
     packets::l4::udp::pack_udp,
-    utils::checksum::internet_checksum,
+    utils::{
+        checksum::internet_checksum,
+        payload_size::payload_len
+    },
     errors::errors::Result,
 };
 
+// Constructeur de paquets UDP
 pub struct UdpBuilder {
     src_ip: Ipv4Addr,
     dst_ip: Ipv4Addr,
 }
 
+// Implementation de UdpBuilder
 impl UdpBuilder {
+
+    // Constructor
     pub fn new(
         src_ip: Ipv4Addr, 
         dst_ip: Ipv4Addr
@@ -25,6 +32,7 @@ impl UdpBuilder {
         }
     }
 
+    /// Construit l'header UDP
     pub fn build_udp_header(
         &self,
         src_port: u16,
@@ -34,8 +42,7 @@ impl UdpBuilder {
     Result<
         UdpHeader
     > {
-        let payload_len = payload.as_ref().map(|p| p.len()).unwrap_or(0);
-        let udp_length = 8 + payload_len;
+        let udp_length = 8 + payload_len(&payload);
 
         let mut udp_header = UdpHeader {
             src_port,
@@ -50,6 +57,7 @@ impl UdpBuilder {
         Ok(udp_header)
     }
 
+    // Calcule le checksum UDP
     fn calculate_udp_checksum(&self, udp_header: &UdpHeader) -> Result<u16> {
         let mut pseudo_header = Vec::new();
         pseudo_header.extend_from_slice(&self.src_ip.octets);
@@ -60,6 +68,8 @@ impl UdpBuilder {
         let udp_datagram = pack_udp(udp_header)?;
         let mut checksum_data = pseudo_header;
         checksum_data.extend_from_slice(&udp_datagram);
-        Ok(internet_checksum(&checksum_data))
+        Ok(
+            internet_checksum(&checksum_data)
+        )
     }
 }

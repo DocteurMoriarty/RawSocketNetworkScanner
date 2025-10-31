@@ -8,9 +8,10 @@ use crate::{
     errors::errors::Result,
 };
 
-
-
+/// Implementation de PacketBuilder
 impl PacketBuilder {
+
+    /// Construit un paquet réseau complet à partir des information du PacketBuilder
     pub fn build_packet(&self) -> Result<crate::structs::network_packet::NetworkPacket> {
         let factory = super::packet_factory::PacketFactory::new(
             self.src_ip,
@@ -21,7 +22,7 @@ impl PacketBuilder {
     }
 }
 
-
+/// Implementation de PacketBuilder
 impl PacketBuilder {
     pub fn from_cli_args(
         src_ip: Option<&str>,
@@ -37,13 +38,13 @@ impl PacketBuilder {
         let src_ip = if let Some(ip) = src_ip {
             parse_ipv4(ip)?
         } else {
-            parse_ipv4("192.168.1.100")? // IP par défaut
+            parse_ipv4("192.168.1.100")?
         };
 
         let dst_ip = if let Some(ip) = dst_ip {
             parse_ipv4(ip)?
         } else {
-            parse_ipv4("192.168.1.1")? // IP par défaut
+            parse_ipv4("192.168.1.1")?
         };
 
         let src_mac = src_mac.unwrap_or([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
